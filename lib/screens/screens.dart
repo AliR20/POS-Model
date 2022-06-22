@@ -1,0 +1,9 @@
+export 'package:pos_model/screens/main_view.dart';
+export 'package:pos_model/screens/cash_out_screen.dart';
+export 'package:pos_model/screens/cashier/cashier_screen.dart';
+export 'package:pos_model/screens/customers/customers_screen.dart';
+export 'package:pos_model/screens/orders/orders_screen.dart';
+export 'package:pos_model/screens/reports/reports_screen.dart';
+export 'package:pos_model/screens/settings/settings_screen.dart';
+export 'package:pos_model/screens/tables/tables_screen.dart';
+export 'package:pos_model/screens/home/home_screen.dart';
