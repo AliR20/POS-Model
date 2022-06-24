@@ -82,27 +82,41 @@ class _TransactionScreenState extends State<TransactionScreen> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 20,),
+                    SizedBox(
+                      height: 20,
+                    ),
                     TransactionContainerList(
                       onExpensesTapped: () {
                         setState(() {
-                          expensesTapped =! expensesTapped;
-                          incomeTapped =false;
+                          expensesTapped = !expensesTapped;
+                          incomeTapped = false;
                         });
                       },
                       onIncomeTapped: () {
                         setState(() {
-                          incomeTapped =! incomeTapped;
+                          incomeTapped = !incomeTapped;
                           expensesTapped = false;
                         });
                       },
                     ),
+                    SizedBox(
+                      height: 5.0,
+                    ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        'Recent Files',
-                        textAlign: TextAlign.start,
-                        style: Theme.of(context).textTheme.headline1,
+                      child: Row(
+                        children: [
+                          Text(
+                            'Recent Files',
+                            textAlign: TextAlign.start,
+                            style: Theme.of(context).textTheme.headline1,
+                          ),
+                          ElevatedButton.icon(
+                            onPressed: () {},
+                            icon: Icon(Icons.sort),
+                            label: Text('Sort By'),
+                          ),
+                        ],
                       ),
                     ),
                     StreamBuilder<QuerySnapshot>(
@@ -150,7 +164,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
                                   ),
                                 ],
                                 rows: List<DataRow>.generate(
-                                         snapshot.data!.docs.length,
+                                    snapshot.data!.docs.length,
                                     (index) => DataRow(
                                             color: MaterialStateProperty.all(
                                               snapshot.data!.docs[index]
