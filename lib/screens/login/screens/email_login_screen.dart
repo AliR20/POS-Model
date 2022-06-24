@@ -61,7 +61,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                await FirebaseMethods.signInWithEmail(
                     email: emailController.text,
                     password: passwordController.text);
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context)=> MainView()));
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> MainView()));
               } else if (emailController.text.isNotEmpty &&
                   passwordController.text.isNotEmpty &&
                   hasAccount == false) {
@@ -69,7 +69,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                     email: emailController.text,
                     password: passwordController.text);
               }
-               Navigator.of(context).push(MaterialPageRoute(builder: (context)=> MainView()));
+               Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> MainView()));
             },
             child: Text(hasAccount ? 'Login' : 'SignUp'),
           ),

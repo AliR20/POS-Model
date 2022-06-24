@@ -43,21 +43,21 @@ class _TransactionScreenState extends State<TransactionScreen> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: SizedBox(
-                height: MediaQuery.of(context).size.height * 1.5,
-                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height * 1.7,
+                width: MediaQuery.of(context).size.width * 1.15,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(15.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text('Transactions',
                               style: Theme.of(context).textTheme.headline1),
                           SizedBox(
-                            height: 50,
+                            height: 53,
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 showDialog(
@@ -82,6 +82,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
                         ],
                       ),
                     ),
+                    SizedBox(height: 20,),
                     TransactionContainerList(
                       onExpensesTapped: () {
                         setState(() {
@@ -149,15 +150,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
                                   ),
                                 ],
                                 rows: List<DataRow>.generate(
-                                    incomeTapped
-                                        ? snapshot.data!.docs
-                                            .where((element) =>
-                                                element['category'] == 'INCOME')
-                                            .length
-                                        : expensesTapped? snapshot.data!.docs
-                                            .where((element) =>
-                                                element['category'] == 'EXPENSE')
-                                            .length: snapshot.data!.docs.length,
+                                         snapshot.data!.docs.length,
                                     (index) => DataRow(
                                             color: MaterialStateProperty.all(
                                               snapshot.data!.docs[index]

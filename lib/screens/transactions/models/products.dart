@@ -11,8 +11,10 @@ class Product {
   final String? imageUrl;
   final String category;
   final String description;
+  final List categoriesList;
 
   Product( {
+   required  this.categoriesList, 
    required  this.description,
     required this.name,
     required this.amount,
@@ -28,6 +30,7 @@ class Product {
       name: snapshot.get('name'),
       imageUrl: snapshot.get('imageUrl'),
       description: snapshot.get('description'),
+      categoriesList: snapshot.get('categoriesList'),
     );
   }
   Map<String, dynamic> toMap() {
@@ -38,6 +41,7 @@ class Product {
       'name': name,
       'imageUrl': imageUrl ?? '',
       'description': description,
+      'categoriesList': categoriesList,
     };
   }
 

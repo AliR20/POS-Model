@@ -50,11 +50,12 @@ class _IncomeViewState extends State<IncomeView> {
     nameController.dispose();
   }
 
-  List<String> categories = [
+  List<String> incomeCategories = [
     'Income',
-    'Expense',
     'Add New',
+
   ];
+  List<String> expensesCategories = ['Expense', 'Add New'];
   List<String> paymentMethods = [
     'Cash',
     'Credit',
@@ -67,6 +68,8 @@ class _IncomeViewState extends State<IncomeView> {
     return Column(
       children: [
         AlertTextField(
+          
+          isCustomer: false,
           labelText: 'Date',
           controller: dateController,
           icon: Icons.calendar_today,
@@ -89,6 +92,8 @@ class _IncomeViewState extends State<IncomeView> {
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: AlertTextField(
+           
+            isCustomer: false,
             labelText: 'Name',
             controller: nameController,
             icon: Icons.border_all_outlined,
@@ -96,9 +101,10 @@ class _IncomeViewState extends State<IncomeView> {
           ),
         ),
         AlertDropDown(
-          items: categories,
-          labelText: 'Category',
-          hintText: 'Category',
+          value: widget.index == 0 ? 'Income' : 'Expense',
+          items: widget.index == 0 ? incomeCategories : expensesCategories,
+          labelText: widget.index == 0 ? 'Income' : 'Expense',
+          hintText: 'Select the Category',
           onTap: (newValue) {
             setState(() {
               category = newValue.toString();
@@ -116,7 +122,8 @@ class _IncomeViewState extends State<IncomeView> {
                           TextButton(
                             onPressed: () {
                               setState(() {
-                                categories.add(newController.text);
+                                category = newController.text;
+                              widget.index == 0? incomeCategories.add(category!): expensesCategories.add(category!);
                               });
                               newController.clear();
                               Navigator.of(context).pop();
@@ -135,6 +142,7 @@ class _IncomeViewState extends State<IncomeView> {
           },
         ),
         AlertDropDown(
+          value: 'Cash',
           items: paymentMethods,
           labelText: 'Payment Method',
           hintText: paymentMethods[0],
@@ -147,6 +155,8 @@ class _IncomeViewState extends State<IncomeView> {
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: AlertTextField(
+            isCustomer: false,
+         
             labelText: 'Amount',
             controller: amountController,
             icon: Icons.attach_money_sharp,
@@ -195,8 +205,9 @@ class _IncomeViewState extends State<IncomeView> {
                         category: category!.toUpperCase(),
                         date: dateController.text,
                         name: nameController.text,
-                        description: descriptionController.text,
-                        imageUrl: imageUrl,
+                        description: descriptionController.text.isEmpty? '': descriptionController.text,
+                       categoriesList: widget.index == 0? incomeCategories: expensesCategories,
+                        imageUrl: imageUrl == null? '': imageUrl,
                       ).toMap(),
                     );
                 Navigator.of(context).pop();

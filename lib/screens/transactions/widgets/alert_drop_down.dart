@@ -6,9 +6,10 @@ class AlertDropDown extends StatelessWidget {
       required this.items,
       required this.labelText,
       required this.hintText,
-      required this.onTap})
+      required this.onTap, required this.value})
       : super(key: key);
   final List<String> items;
+  final String value;
   final String labelText, hintText;
   final void Function(Object?) onTap;
   @override
@@ -19,6 +20,7 @@ class AlertDropDown extends StatelessWidget {
           BoxDecoration(borderRadius: BorderRadius.circular(10.0)),
       height: 55,
       child: DropdownButtonFormField(
+        value: value,
         decoration: InputDecoration(
           labelText: labelText,
           border: OutlineInputBorder(

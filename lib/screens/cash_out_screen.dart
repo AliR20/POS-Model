@@ -21,7 +21,9 @@ class CashOutScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const CashOutTopRow(),
+                  const CashOutTopRow(
+                    isCustomer: false,
+                  ),
                   Divider(
                     color: Theme.of(context).colorScheme.background,
                     height: 5,
@@ -51,7 +53,9 @@ class CashOutScreen extends StatelessWidget {
             ),
             body: Column(
               children: [
-                const CashOutTopRow(),
+                const CashOutTopRow(
+                  isCustomer: false,
+                ),
                 Divider(
                   color: Theme.of(context).colorScheme.background,
                   height: 5,
