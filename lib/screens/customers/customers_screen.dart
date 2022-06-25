@@ -4,8 +4,6 @@ import 'package:pos_model/screens/customers/widgets/add_customer_pop_up.dart';
 import 'package:pos_model/screens/customers/widgets/customers_view.dart';
 import 'package:pos_model/widgets/side_drawer.dart';
 
-import '../cash_out_screen.dart';
-
 class CustomersScreen extends StatelessWidget {
   const CustomersScreen({
     Key? key,

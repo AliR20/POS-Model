@@ -11,11 +11,7 @@ class TransactionContainer extends StatelessWidget {
       required this.percent,
       required this.onTap, required this.isIncome})
       : super(key: key);
-  final String name;
-  final String amount;
-  final String info;
-  final String percent;
-  final String imageUrl;
+  final String name,amount,info,percent,imageUrl;
   final VoidCallback onTap;
   final bool isIncome;
   @override

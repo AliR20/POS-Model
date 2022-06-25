@@ -1,20 +1,13 @@
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:awesome_calendar/awesome_calendar.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:pos_model/screens/login/services/firebase_services.dart';
-import 'package:pos_model/screens/transactions/models/products.dart';
+import 'package:pos_model/screens/transactions/utils/const.dart';
+import 'package:pos_model/screens/transactions/widgets/add_new_category_dialog.dart';
 import 'package:pos_model/screens/transactions/widgets/alert_drop_down.dart';
 import 'package:pos_model/screens/transactions/widgets/alert_text_field.dart';
 import 'package:pos_model/screens/transactions/widgets/upload_product_container.dart';
 import 'package:pos_model/utils/date_formatter.dart';
-
-import '../../../utils/responsive.dart';
 
 class IncomeView extends StatefulWidget {
   const IncomeView({Key? key, required this.index}) : super(key: key);
@@ -53,7 +46,6 @@ class _IncomeViewState extends State<IncomeView> {
   List<String> incomeCategories = [
     'Income',
     'Add New',
-
   ];
   List<String> expensesCategories = ['Expense', 'Add New'];
   List<String> paymentMethods = [
@@ -68,7 +60,6 @@ class _IncomeViewState extends State<IncomeView> {
     return Column(
       children: [
         AlertTextField(
-          
           isCustomer: false,
           labelText: 'Date',
           controller: dateController,
@@ -92,7 +83,6 @@ class _IncomeViewState extends State<IncomeView> {
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: AlertTextField(
-           
             isCustomer: false,
             labelText: 'Name',
             controller: nameController,
@@ -113,31 +103,16 @@ class _IncomeViewState extends State<IncomeView> {
               showDialog(
                   barrierDismissible: false,
                   context: context,
-                  builder: (context) => AlertDialog(
-                        title: Text('Add New Category'),
-                        content: TextField(
-                          controller: newController,
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
+                  builder: (context) => AddNewCategoryDialog(newController: newController, onPressed: () {
                               setState(() {
                                 category = newController.text;
-                              widget.index == 0? incomeCategories.add(category!): expensesCategories.add(category!);
+                                widget.index == 0
+                                    ? incomeCategories.add(category!)
+                                    : expensesCategories.add(category!);
                               });
                               newController.clear();
                               Navigator.of(context).pop();
-                            },
-                            child: Text('Save'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('Cancel'),
-                          ),
-                        ],
-                      ));
+                            },));
             }
           },
         ),
@@ -156,7 +131,6 @@ class _IncomeViewState extends State<IncomeView> {
           padding: const EdgeInsets.only(top: 8.0),
           child: AlertTextField(
             isCustomer: false,
-         
             labelText: 'Amount',
             controller: amountController,
             icon: Icons.attach_money_sharp,
@@ -189,28 +163,15 @@ class _IncomeViewState extends State<IncomeView> {
             width: 200,
             child: ElevatedButton.icon(
               onPressed: () async {
-                final imageUrl = await FirebaseStorage.instance
-                    .ref()
-                    .child('Products')
-                    .child(FirebaseAuth.instance.currentUser!.uid)
-                    .getDownloadURL();
-                await FirebaseFirestore.instance
-                    .collection('products')
-                    .doc(FirebaseAuth.instance.currentUser!.uid)
-                    .collection('userProducts')
-                    .doc()
-                    .set(
-                      Product(
-                        amount: amountController.text,
-                        category: category!.toUpperCase(),
-                        date: dateController.text,
-                        name: nameController.text,
-                        description: descriptionController.text.isEmpty? '': descriptionController.text,
-                       categoriesList: widget.index == 0? incomeCategories: expensesCategories,
-                        imageUrl: imageUrl == null? '': imageUrl,
-                      ).toMap(),
-                    );
-                Navigator.of(context).pop();
+                productsSaving(
+                  context,
+                  amountController.text,
+                  category!.toUpperCase(),
+                  dateController.text,
+                  nameController.text,
+                  descriptionController.text,
+                  widget.index == 0 ? incomeCategories : expensesCategories,
+                );
               },
               icon: Icon(
                 Icons.save,

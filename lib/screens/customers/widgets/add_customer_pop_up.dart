@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:pos_model/screens/customers/widgets/addition_text_field.dart';
+import 'package:pos_model/screens/login/services/firebase_services.dart';
+import 'package:pos_model/screens/transactions/utils/const.dart';
 import 'package:pos_model/screens/transactions/widgets/alert_drop_down.dart';
 import 'package:pos_model/screens/transactions/widgets/alert_text_field.dart';
 import 'package:pos_model/utils/date_formatter.dart';
-import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class AddCustomersPopUp extends StatefulWidget {
   AddCustomersPopUp({Key? key}) : super(key: key);
@@ -31,10 +31,12 @@ class _AddCustomersPopUpState extends State<AddCustomersPopUp> {
   final TextEditingController discountController = TextEditingController();
 
   final TextEditingController bioController = TextEditingController();
-   final TextEditingController shippingAddressController = TextEditingController();
-   final TextEditingController dateController = TextEditingController();
+  final TextEditingController shippingAddressController =
+      TextEditingController();
+  final TextEditingController dateController = TextEditingController();
 
   String customerType = '';
+  String payment = '';
 
   List<String> customerTypeList = [
     'Individual',
@@ -47,15 +49,39 @@ class _AddCustomersPopUpState extends State<AddCustomersPopUp> {
     'Partial',
   ];
   String? location;
-  Future<String> getLocation()async{
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-        var addresses = await GeocodingPlatform.instance.placemarkFromCoordinates(position.latitude,position.longitude);
-        var first = addresses.first;
-       setState(() {
-         location = '${first.country} ${first.street}';
-       });
-       return location!;
+  Future<Position> _getGeoLocationPosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings();
+      return Future.error('Location services are disabled.');
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
   }
+
+  Future<String> getLocation(Position position) async {
+    var addresses = await GeocodingPlatform.instance
+        .placemarkFromCoordinates(position.latitude, position.longitude);
+    var first = addresses.first;
+    setState(() {
+      location = '${first.country} ${first.street}';
+    });
+    return location!;
+  }
+
   Uint8List? images;
   Uint8List? webImage;
   Future<Uint8List> getImageFromGallery() async {
@@ -81,6 +107,7 @@ class _AddCustomersPopUpState extends State<AddCustomersPopUp> {
       // User canceled the picker
     }
   }
+
   String? date;
 
   @override
@@ -107,6 +134,7 @@ class _AddCustomersPopUpState extends State<AddCustomersPopUp> {
                 InkWell(
                   onTap: () async {
                     await getWebFile();
+                    await FirebaseMethods.storeWebImage(webImage!, 'Customers');
                   },
                   child: Container(
                     alignment: Alignment.center,
@@ -128,14 +156,22 @@ class _AddCustomersPopUpState extends State<AddCustomersPopUp> {
                     items: customerTypeList,
                     labelText: 'Type',
                     hintText: 'Individual/Business',
-                    onTap: (value) {},
+                    onTap: (value) {
+                      setState(() {
+                        customerType = value.toString();
+                      });
+                    },
                     value: 'Individual'),
-              
+
                 InkWell(
-                  onTap: (){
-                    getLocation();
+                  onTap: () async {
+                    Position position = await _getGeoLocationPosition();
+                    await getLocation(position);
                   },
-                  child: Text(location == null? 'Click to enter your location': location!),),
+                  child: Text(location == null
+                      ? 'Click to enter your location'
+                      : location!),
+                ),
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: AlertTextField(
@@ -148,7 +184,9 @@ class _AddCustomersPopUpState extends State<AddCustomersPopUp> {
                     items: paymentMethods,
                     labelText: 'Payment',
                     hintText: 'Cash',
-                    onTap: (value) {},
+                    onTap: (value) {
+                      payment = value.toString();
+                    },
                     value: 'Cash'),
 
                 Padding(
@@ -159,32 +197,33 @@ class _AddCustomersPopUpState extends State<AddCustomersPopUp> {
                     isCustomer: true,
                   ),
                 ),
-              
-               Padding(
-                 padding: const EdgeInsets.only(top:8.0),
-                 child: AlertTextField(
-          
-          isCustomer: false,
-          labelText: 'Date',
-          controller: dateController,
-          icon: Icons.calendar_today,
-          onTap: () async {
-            final List<DateTime>? picked = await showDialog<List<DateTime>>(
-              context: context,
-              builder: (BuildContext context) {
-                  return const AwesomeCalendarDialog(
-                    selectionMode: SelectionMode.multi,
-                    canToggleRangeSelection: true,
-                  );
-              },
-            );
-            final formattedDate = DateFormatter.formateDate(picked!.first);
-            setState(() {
-              dateController.text = formattedDate;
-            });
-          },
-        ),
-               ),
+
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: AlertTextField(
+                    isCustomer: false,
+                    labelText: 'PayTime',
+                    controller: dateController,
+                    icon: Icons.calendar_today,
+                    onTap: () async {
+                      final List<DateTime>? picked =
+                          await showDialog<List<DateTime>>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const AwesomeCalendarDialog(
+                            selectionMode: SelectionMode.multi,
+                            canToggleRangeSelection: true,
+                          );
+                        },
+                      );
+                      final formattedDate =
+                          DateFormatter.formateDate(picked!.first);
+                      setState(() {
+                        dateController.text = formattedDate;
+                      });
+                    },
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: AlertTextField(
@@ -193,14 +232,15 @@ class _AddCustomersPopUpState extends State<AddCustomersPopUp> {
                     isCustomer: true,
                   ),
                 ),
-                AdditionTextField(), //TODO custom field with additon
-                   Padding(
+                //         AdditionTextField(), //TODO custom field with additon
+                Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: AlertTextField(
                     labelText: 'Shipping Address',
                     controller: shippingAddressController,
                     isCustomer: true,
-                  ),),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: AlertTextField(
@@ -222,26 +262,38 @@ class _AddCustomersPopUpState extends State<AddCustomersPopUp> {
                   child: SizedBox(
                     height: 40,
                     child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            onPrimary:
-                               Colors.white),
+                        style:
+                            ElevatedButton.styleFrom(onPrimary: Colors.white),
                         onPressed: () {},
                         child: Text(
                             'Save as Walk in Customer(A Customer with no information)')),
                   ),
                 ),
-                 Padding(
+                Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: SizedBox(
                     height: 40,
                     width: 150,
                     child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            onPrimary:
-                               Colors.white),
-                        onPressed: () {},
-                        child: Text(
-                            'Save ')),
+                        style:
+                            ElevatedButton.styleFrom(onPrimary: Colors.white),
+                        onPressed: () async {
+                          addingCustomer(
+                            context: context,
+                            name: nameController.text,
+                            bio: bioController.text,
+                            type: payment,
+                            location: location == null ? '' : location!,
+                            phoneNumber: numberController.text,
+                            paymentType: payment,
+                            date: dateController.text,
+                            openingBalance: balanceController.text,
+                            shippingAddress: shippingAddressController.text,
+                            creditLimit: creditController.text,
+                            discountPercentage: discountController.text,
+                          );
+                        },
+                        child: Text('Save ')),
                   ),
                 ),
               ],

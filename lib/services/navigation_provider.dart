@@ -36,7 +36,7 @@ class TopRowProvider extends ChangeNotifier{
   }
 }
 class NavigationProvider extends ChangeNotifier{
-  NavigatorItem _navigatorItem = NavigatorItem.customers;
+  NavigatorItem _navigatorItem = NavigatorItem.transactions;
   NavigatorItem get navigationItem => _navigatorItem;
   void setNavigatorItem(NavigatorItem navItem){
     _navigatorItem = navItem;

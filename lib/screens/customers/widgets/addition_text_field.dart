@@ -6,7 +6,8 @@ class AdditionTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        
+        TextField(),
+        IconButton(onPressed: (){}, icon: Icon(Icons.add),),
       ],
     );
   }

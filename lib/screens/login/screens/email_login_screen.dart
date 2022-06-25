@@ -23,6 +23,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
       backgroundColor: Theme.of(context).colorScheme.background,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           TextFormField(
             key: formKey,
